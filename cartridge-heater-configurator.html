@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartridge Heater Configurator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="header-left">
+      <h1>Cartridge Heater <span>Configurator</span></h1>
+      <p>Internal Engineering Tool — Custom Specification Builder</p>
+      <button id="themeToggle" class="theme-toggle">☀️ Light Mode</button>
+    </div>
+    <div class="header-badge">Internal Tool v1.0</div>
+  </header>
+
+  <div class="drawing-panel">
+    <div class="drawing-toolbar">
+      <span>Technical Drawing</span>
+    </div>
+      <div class="drawing-stage" id="drawingStage">
+        <img id="heaterBaseImage" src="images/base-heater.png" class="heater-image" />
+        
+        <div class="dim-label" id="dimLength">4.0"</div>
+        <div class="dim-label" id="dimDiameter">0.5"</div>
+        <div class="dim-label" id="dimLead">12"</div>
+        <div class="dim-label" id="dimProt" style="display:none;">2.0"</div>
+
+        <div class="drawing-specs-overlay">
+          <div class="specs-col" id="drawingSpecsList">
+            </div>
+          <div class="contact-col">
+            MPI Morheat<br>
+            sales@mpimorheat.com<br>
+            (800) 817-3486
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <div class="layout">
+    <div class="config-col sections-grid">
+
+      <div class="section span-2">
+        <div class="section-header">
+          <span class="section-title">01 — Dimensions</span>
+          <span class="section-status status-required" id="st-dims">○ Required</span>
+        </div>
+        <div class="section-body">
+          <div class="two-col">
+            <div class="field">
+              <div class="field-label">Outer Diameter</div>
+              <div class="opts" id="diam-opts">
+                <div class="opt" data-group="diam" data-val="0.25" onclick="selectOpt(this)">1/4" <span class="sub">0.250"</span></div>
+                <div class="opt" data-group="diam" data-val="0.375" onclick="selectOpt(this)">3/8" <span class="sub">0.375"</span></div>
+                <div class="opt" data-group="diam" data-val="0.5" onclick="selectOpt(this)">1/2" <span class="sub">0.500"</span></div>
+                <div class="opt" data-group="diam" data-val="0.625" onclick="selectOpt(this)">5/8" <span class="sub">0.625"</span></div>
+                <div class="opt" data-group="diam" data-val="0.75" onclick="selectOpt(this)">3/4" <span class="sub">0.750"</span></div>
+                <div class="opt" data-group="diam" data-val="1.0" onclick="selectOpt(this)">1" <span class="sub">1.000"</span></div>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label">Heated Length</div>
+              <div class="num-wrap">
+                <input type="number" id="length-in" min="0.5" max="48" step="0.5" oninput="updateCalc()">
+                <span class="num-unit">inches</span>
+              </div>
+            </div>
+            <div class="input-grid span-2">
+              <div class="input-group">
+                <label>Lead Length (in)</label>
+                <input type="number" id="lead-in" value="" step="1" oninput="updateCalc()">
+              </div>
+              <div class="input-group" id="prot-len-group" style="display:none;">
+                <label>Prot. Length (in)</label>
+                <input type="number" id="prot-in" value="" step="0.1" oninput="updateCalc()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">02 — Electrical</span>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <div class="field-label">Voltage</div>
+            <div class="opts" id="volt-opts">
+              <div class="opt" data-group="volt" data-val="120" onclick="selectOpt(this)">120V</div>
+              <div class="opt" data-group="volt" data-val="240" onclick="selectOpt(this)">240V</div>
+              <div class="opt" data-group="volt" data-val="480" onclick="selectOpt(this)">480V</div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Wattage</div>
+            <div class="num-wrap">
+              <input type="number" id="watt-in" min="50" max="12000" step="50" placeholder="e.g. 500" oninput="updateCalc()">
+              <span class="num-unit">watts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">03 — Sheath Material</span>
+        </div>
+        <div class="section-body">
+          <div class="opts" id="sheath-opts">
+            <div class="opt" data-group="sheath" data-val="ss304" onclick="selectOpt(this)">304 Stainless</div>
+            <div class="opt" data-group="sheath" data-val="incoloy800" onclick="selectOpt(this)">Incoloy 800</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">04 — Lead Wire</span>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <div class="field-label">Lead Type</div>
+            <div class="opts" id="lead-opts">
+              <div class="opt" data-group="lead" data-val="fiberglass" onclick="selectOpt(this)">Fibreglass</div>
+              <div class="opt" data-group="lead" data-val="teflon" onclick="selectOpt(this)">Teflon (PTFE)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">07 — Fitting Options</span>
+        </div>
+        <div class="section-body">
+          <div class="opts" id="fit-opts">
+            <div class="opt selected" data-group="fit" data-val="none" onclick="selectOpt(this)">None (Plain)</div>
+            <div class="opt" data-group="fit" data-val="brass" onclick="selectOpt(this)">Brass Fitting</div>
+            <div class="opt" data-group="fit" data-val="stainless" onclick="selectOpt(this)">Stainless Fitting</div>
+            <div class="opt" data-group="fit" data-val="double" onclick="selectOpt(this)">Double Ended (Brass)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section span-2">
+        <div class="section-header">
+          <span class="section-title">06 — Exit & Lead Protection</span>
+        </div>
+        <div class="section-body">
+          <div class="opts" id="exit-opts">
+            <div class="opt selected" data-group="exit" data-val="straight_none" onclick="selectOpt(this)">Straight / None</div>
+            <div class="opt" data-group="exit" data-val="90_none" onclick="selectOpt(this)">90° / None</div>
+            <div class="opt" data-group="exit" data-val="straight_braid" onclick="selectOpt(this)">Straight / SS Braid</div>
+            <div class="opt" data-group="exit" data-val="90_braid" onclick="selectOpt(this)">90° / SS Braid</div>
+            <div class="opt" data-group="exit" data-val="straight_armor" onclick="selectOpt(this)">Straight / SS Armor</div>
+            <div class="opt" data-group="exit" data-val="90_armor" onclick="selectOpt(this)">90° / SS Armor</div>
+            <div class="opt" data-group="exit" data-val="post" onclick="selectOpt(this)">Post Terminal</div>
+            <div class="opt" data-group="exit" data-val="box" onclick="selectOpt(this)">Terminal Box</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section span-2">
+        <div class="section-header">
+          <span class="section-title">08 — Process Fittings</span>
+        </div>
+        <div class="section-body">
+          <div class="input-grid">
+            <div class="input-group">
+              <label>NPT Fitting / Flange</label>
+              <select id="npt-type" onchange="updateCustomSelect(this, 'nptType')">
+                <option value="na">NA</option>
+                <option value="npt_process">NPT Process Fitting</option>
+                <option value="flange">Flange</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Process Connection</label>
+              <select id="process-conn" onchange="updateCustomSelect(this, 'processConn')">
+                <option value="na">NA</option>
+                <option value="1/4_npt">1/4" NPT</option>
+                <option value="3/8_npt">3/8" NPT</option>
+                <option value="1/2_npt">1/2" NPT</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section span-2">
+        <div class="section-header">
+          <span class="section-title">09 — Internal Thermocouple</span>
+        </div>
+        <div class="section-body">
+          <div class="input-grid">
+            <div class="input-group">
+              <label>Thermocouple Type</label>
+              <select id="tcouple-type" onchange="updateCustomSelect(this, 'tcouple')">
+                <option value="none">None</option>
+                <option value="type_j">Type J</option>
+                <option value="type_k">Type K</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Location</label>
+              <select id="tcouple-loc" onchange="updateCustomSelect(this, 'tcoupleLoc')">
+                <option value="na">NA</option>
+                <option value="disk">Disk End</option>
+                <option value="middle_sheath">Middle (Sheath Temp)</option>
+                <option value="middle_heater">Middle (Heater Temp)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section span-2">
+        <div class="section-header">
+          <span class="section-title">10 — Leads & Ground</span>
+        </div>
+        <div class="section-body">
+          <div class="input-grid">
+            <div class="input-group">
+              <label>Ground Wire</label>
+              <select id="ground-wire" onchange="updateCustomSelect(this, 'ground')">
+                <option value="na">NA</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Fiberglass Sleeving</label>
+              <select id="fiberglass-sleeve" onchange="updateCustomSelect(this, 'sleeving')">
+                <option value="na">NA</option>
+                <option value="1_sleeve">1 sleeve over both leads</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section span-2">
+        <div class="section-header">
+          <span class="section-title">11 — End Seal / Potting</span>
+        </div>
+        <div class="section-body">
+          <div class="input-group">
+              <label>Seal Type</label>
+              <select id="end-seal" onchange="updateCustomSelect(this, 'seal')">
+                <option value="cement">Cement Potting (Standard) - 1800°F 982°C</option>
+                <option value="teflon">Teflon Seal - 300°F 149°C</option>
+              </select>
+            </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div class="summary">
+        <div class="sum-header">
+          <span class="sum-header-title">Configuration Summary</span>
+        </div>
+
+        <div class="vis-wrap">
+          <svg id="heater-svg" width="280" height="90" viewBox="0 0 280 90">
+            <g id="svg-fitting-npt" opacity="0">
+              <rect x="185" y="25" width="15" height="40" fill="#666" />
+              <rect x="200" y="30" width="8" height="30" fill="#888" />
+            </g>
+            <rect id="svg-fitting-flange" x="195" y="15" width="8" height="60" fill="#777" opacity="0" />
+
+            <rect id="h-body" x="20" y="28" width="180" height="34" rx="17" fill="#1e1e1e" stroke="#e8622a" stroke-width="1.5"/>
+            
+            <rect id="svg-hose" x="200" y="38" width="60" height="14" fill="#444" stroke="#666" stroke-width="1" stroke-dasharray="2,2" opacity="0" />
+            
+            <rect id="h-lead" x="200" y="40" width="62" height="10" rx="2" fill="#2a2a2a" stroke="#3d3d3d" stroke-width="0.5"/>
+          </svg>
+        </div>
+
+        <div class="spec-list">
+          <div class="spec-row"><span class="spec-k">Diameter</span><span class="spec-v empty" id="sv-diam">—</span></div>
+          <div class="spec-row"><span class="spec-k">Length</span><span class="spec-v empty" id="sv-len">—</span></div>
+          <div class="spec-row"><span class="spec-k">Voltage</span><span class="spec-v empty" id="sv-volt">—</span></div>
+          <div class="spec-row"><span class="spec-k">Wattage</span><span class="spec-v empty" id="sv-watt">—</span></div>
+          <div class="spec-row"><span class="spec-k">Sheath</span><span class="spec-v empty" id="sv-sheath">—</span></div>
+          <div class="spec-row"><span class="spec-k">Lead Type</span><span class="spec-v empty" id="sv-lead">—</span></div>
+          <div class="spec-row"><span class="spec-k">Exit Protection</span><span class="spec-v" id="sv-exit">None</span></div>
+          <div class="spec-row"><span class="spec-k">Fitting</span><span class="spec-v" id="sv-fit">None</span></div>
+        </div>
+
+        <div class="btn-wrap">
+          <button class="btn btn-primary" onclick="copySpecToClipboard()">Copy Spec Sheet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
