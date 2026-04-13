@@ -10,7 +10,9 @@ let S = {
   tcoupleLoc: 'na',
   ground: 'na', 
   sleeving: 'na', 
-  seal: 'cement'
+  seal: 'cement',
+  ground: 'no',
+  sleeving: 'none'
 };
 
 let unitMode = 'in'; // 'in' or 'mm'
@@ -24,6 +26,14 @@ const INCH_DIAMS = [
   { frac: '1"', dec: '1.000' }
 ];
 
+function getThermocoupleText() {
+  if (S.tcouple === 'none') return 'None';
+
+  const type = TCOUPLE_LABELS[S.tcouple] || '';
+  const loc = TCOUPLE_LOC_LABELS[S.tcoupleLoc] || '';
+
+  return loc ? `${type} - ${loc}` : (type);
+}
 const MM_DIAMS = [6, 6.5, 8, 10, 12, 12.5, 13, 14, 15, 16, 17, 19, 20, 21, 25];
 
 function diamDisplay(val) {
@@ -60,6 +70,22 @@ function renderDiamOptions() {
       container.appendChild(opt);
     });
   }
+}
+
+function handleTCoupleChange() {
+  const type = document.getElementById('tcouple-type').value;
+  S.tcouple = type;
+
+  const locGroup = document.getElementById('tcouple-loc-group');
+
+  if (type === 'none') {
+    locGroup.style.display = 'none';
+    S.tcoupleLoc = 'na';
+  } else {
+    locGroup.style.display = 'block';
+  }
+
+  updateCalc();
 }
 
 function toggleUnits() {
@@ -144,6 +170,8 @@ const EXIT_LABELS = {
     box: 'Terminal Box'
 };
 
+
+
 const FIT_LABELS = {
     none: 'None', stainless: 'Stainless Fitting', brass: 'Brass Fitting', double: 'Double Ended Fitting'
 };
@@ -151,6 +179,52 @@ const FIT_LABELS = {
 const SHEATH_COLORS = {
   ss304: '#378ADD', ss316: '#4caf7d', incoloy800: '#e8622a',
   incoloy840: '#d4522a', copper: '#EF9F27', brass: '#BA7517', titanium: '#888780'
+};
+
+const NPT_LABELS = {
+  na: 'NA',
+  npt_process: 'NPT Process Fitting',
+  flange: 'Flange'
+};
+
+const PROCESS_CONN_LABELS = {
+  na: 'NA',
+  '1/4_npt': '1/4" NPT',
+  '3/8_npt': '3/8" NPT',
+  '1/2_npt': '1/2" NPT'
+};
+
+const TCOUPLE_LABELS = {
+  none: 'None',
+  type_j: 'Type J',
+  type_k: 'Type K'
+};
+
+const TCOUPLE_LOC_LABELS = {
+  disk: 'Disk End',
+  middle_sheath: 'Middle (Sheath Temp)',
+  middle_heater: 'Middle (Heater Temp)'
+};
+
+const GROUND_LABELS = {
+  na: 'No',
+  yes: 'Yes'
+};
+
+const SLEEVE_LABELS = {
+  none: 'No Sleeving',
+  both: '1 sleeve over both leads',
+  each: '1 sleeve over each lead'
+};
+
+const SEAL_LABELS = {
+  cement: 'Cement Potting (Standard) - 1800°F 982°C',
+  ceramic: 'Ceramic End Piece - 2500°F 1371°C',
+  teflon: 'Teflon Seal - 300°F 149°C',
+  laval: 'Laval End Piece - 3000°F 1649°C',
+  epoxylite: 'Epoxylite Potting - 650°F 343°C',
+  epoxy: 'Epoxy Potting - 265°F 129°C',
+  silicone: 'Silicone Rubber - 500°F 260°C'
 };
 
 const IMAGE_MAP = {
@@ -194,6 +268,12 @@ const IMAGE_MAP = {
   "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '32%', left: '25%' }, len: { bottom: '42%', left: '31%' }, lead: { top: '50%', right: '100%' }} }
 };
 
+const TCOUPLE_IMAGE_MAP = {
+  disk: "tc-disk.png",
+  middle_sheath: "tc-middle-sheath.png",
+  middle_heater: "tc-middle-sheath.png"
+};
+
 function selectOpt(el) {
   const group = el.dataset.group;
   const val = el.dataset.val;
@@ -211,7 +291,7 @@ function updateCalc() {
     if (!el || el.value === '') return '';
     const raw = parseFloat(el.value);
     if (isNaN(raw)) return '';
-    return raw; // Just return the exact number they typed
+    return raw; // Just return the exact number they typedext
   };
 
   S.length  = readLen('length-in');
@@ -288,6 +368,24 @@ function updateDrawing() {
   
   baseImg.src = `images/${config.file}`;
 
+  // --- Thermocouple overlay (SAFE) ---
+  const tcImg = document.getElementById('tcOverlay');
+
+  if (tcImg) {
+    if (S.tcouple !== 'none' && S.tcoupleLoc !== 'na') {
+      const file = TCOUPLE_IMAGE_MAP[S.tcoupleLoc];
+
+      if (file) {
+        tcImg.src = `images/${file}`;
+        tcImg.style.display = 'block';
+      } else {
+        tcImg.style.display = 'none';
+      }
+    } else {
+      tcImg.style.display = 'none';
+    }
+  }
+
   const labels = {
     diam: document.getElementById("dimDiameter"),
     len:  document.getElementById("dimLength"),
@@ -324,20 +422,60 @@ function updateDrawing() {
     }
   });
 
+
+
+  
   const specsList = document.getElementById('drawingSpecsList');
   if (specsList) {
     specsList.innerHTML = `
       <div class="spec-line"><span class="sl-lbl">Wattage:</span> <span class="sl-val">${S.watt ? S.watt + 'W' : 'NA'}</span></div>
       <div class="spec-line"><span class="sl-lbl">Voltage:</span> <span class="sl-val">${S.volt ? S.volt + 'V' : 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">NPT Fitting / Flange:</span> <span class="sl-val">${S.nptType !== 'na' ? S.nptType : 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Process Fitting / Connection:</span> <span class="sl-val">${S.processConn !== 'na' ? S.processConn : 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Fitting Options:</span> <span class="sl-val">${FIT_LABELS[S.fit] || 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Exit & Lead Protection:</span> <span class="sl-val">${EXIT_LABELS[S.exit] || 'None'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Lead Material:</span> <span class="sl-val">${S.leadMat || 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Internal Thermocouple:</span> <span class="sl-val">${S.tcouple !== 'none' ? S.tcouple : 'None'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Ground Wire:</span> <span class="sl-val">${S.ground !== 'na' ? S.ground : 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Fiberglass Sleeving:</span> <span class="sl-val">${S.sleeving !== 'na' ? S.sleeving : 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">End Seal / Potting:</span> <span class="sl-val">${S.seal === 'teflon' ? 'Teflon Seal - 300°F 149°C' : 'Cement Potting (Standard) – 1800°F 982°C'}</span></div>
+      <div class="spec-line">
+        <span class="sl-lbl">Watt Density:</span> 
+        <span class="sl-val">
+          ${
+            getWattDensity() 
+              ? getWattDensity().toFixed(2) + ' W/in²' 
+              : 'NA'
+          }
+        </span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Process Fitting / Connection :</span> 
+        <span class="sl-val">
+          ${PROCESS_CONN_LABELS[S.processConn] || 'NA'}
+        </span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Fitting Options:</span> 
+        <span class="sl-val">${FIT_LABELS[S.fit] || 'NA'}</span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Lead Material:</span> 
+        <span class="sl-val">${S.leadMat || 'NA'}</span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Exit & Lead Protection:</span> 
+        <span class="sl-val">${EXIT_LABELS[S.exit] || 'None'}</span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Internal Thermocouple:</span> 
+        <span class="sl-val">${getThermocoupleText()}</span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Ground Wire:</span> 
+        <span class="sl-val">${GROUND_LABELS[S.ground] || 'No'}</span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">Fiberglass Sleeving:</span> 
+        <span class="sl-val">${SLEEVE_LABELS[S.sleeving] || 'No Sleeving'}</span>
+      </div>
+
+      <div class="spec-line"><span class="sl-lbl">End Seal / Potting:</span> 
+        <span class="sl-val">
+          ${SEAL_LABELS[S.seal] || 'Cement Potting (Standard) - 1800°F 982°C'}
+        </span>
+      </div>
     `;
   }
 }
@@ -390,6 +528,24 @@ function makeLabelsDraggable() {
   });
 }
 // --------------------------------------------------------------------------------
+
+function getWattDensity() {
+  const W = parseFloat(S.watt);
+  let D = parseFloat(S.diam);
+  let L = parseFloat(S.length);
+
+  if (!W || !D || !L) return null;
+
+  // Convert mm → inches if needed
+  if (unitMode === 'mm') {
+    D = D / 25.4;
+    L = L / 25.4;
+  }
+
+  const wd = W / (Math.PI * D * L);
+
+  return wd;
+}
 
 function buildSpecText() {
   const diamStr = S.diam
