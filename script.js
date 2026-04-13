@@ -1,6 +1,7 @@
 let S = {
   diam: '', length: '', volt: '120', watt: '500',
   sheath: 'ss304', lead: 'fiberglass', stdlead: '',
+  leadMat: 'MGT 750°C - 1382°F / 750°C', 
   exit: 'straight_none', fit: 'none',
   protLen: '',
   nptType: 'na', 
@@ -68,23 +69,16 @@ function toggleUnits() {
   const btn = document.getElementById('unitToggle');
   if (btn) btn.textContent = unitMode === 'in' ? '⇄ mm' : '⇄ inches';
 
-  // Convert the numeric input field values
+  // Reset the numeric input field values
   const numFields = [
     { id: 'length-in', key: 'length' },
     { id: 'lead-in',   key: 'stdlead' },
     { id: 'prot-in',   key: 'protLen' }
   ];
   numFields.forEach(({ id, key }) => {
+    S[key] = ''; // Clear the saved state
     const el = document.getElementById(id);
-    if (!el) return;
-    const raw = parseFloat(S[key]);
-    if (!isNaN(raw) && raw > 0) {
-      el.value = unitMode === 'mm'
-        ? (raw * 25.4).toFixed(1)
-        : parseFloat((raw / 25.4).toFixed(4));
-    } else {
-      el.value = '';
-    }
+    if (el) el.value = ''; // Clear the input box
   });
 
   // Update "inches" / "mm" unit labels next to inputs
@@ -115,7 +109,7 @@ function saveState() {
 function syncUIToState() {
 const inputs = { 'length-in': 'length', 'lead-in': 'stdlead', 'prot-in': 'protLen', 'watt-in': 'watt', 'volt-in': 'volt' };
   // ...
-  ['diam', 'sheath', 'lead', 'exit', 'fit'].forEach(group => { // removed 'volt' here
+  ['diam', 'sheath', 'leadMat', 'lead', 'exit', 'fit'].forEach(group => { // removed 'volt' here
     document.querySelectorAll(`[data-group="${group}"]`).forEach(opt => {
       opt.classList.toggle('selected', opt.dataset.val === S[group]);
     });
@@ -212,13 +206,12 @@ function selectOpt(el) {
 }
 
 function updateCalc() {
-  // Read numeric inputs — convert from mm to inches if in mm mode
   const readLen = (id) => {
     const el = document.getElementById(id);
     if (!el || el.value === '') return '';
     const raw = parseFloat(el.value);
     if (isNaN(raw)) return '';
-    return unitMode === 'mm' ? raw / 25.4 : raw;
+    return raw; // Just return the exact number they typed
   };
 
   S.length  = readLen('length-in');
@@ -248,8 +241,11 @@ function sv(id, val, isEmpty) {
 
 function updateVis() {
   const diam = parseFloat(S.diam) || 0.5;
-  const len = S.length || 4;
-  const w = Math.min(175, Math.max(30, len * 12));
+  // Normalize len just for the visual drawing so mm doesn't stretch the SVG infinitely
+  const rawLen = parseFloat(S.length) || (unitMode === 'mm' ? 100 : 4);
+  const normalizedLen = unitMode === 'mm' ? rawLen / 25.4 : rawLen;
+  const w = Math.min(175, Math.max(30, normalizedLen * 12));
+  
   const x0 = 20;
   const color = S.sheath ? SHEATH_COLORS[S.sheath] : '#e8622a';
 
@@ -259,6 +255,12 @@ function updateVis() {
     body.setAttribute('stroke', color);
   }
 
+  const matVal = S.leadMat || 'Fiberglass 450C - 842F';
+  const displayNode = document.getElementById('sv-leadMat');
+  if (displayNode) {
+    displayNode.textContent = S.leadMat || 'NA';
+  }
+
   const lead = document.getElementById('h-lead');
   if (lead) lead.setAttribute('x', x0 + w);
 
@@ -266,7 +268,7 @@ function updateVis() {
     ? (unitMode === 'mm' ? S.diam + ' mm' : diamDisplay(S.diam))
     : '—';
   const lenStr = S.length
-    ? (unitMode === 'mm' ? (parseFloat(S.length)*25.4).toFixed(1)+' mm' : S.length + '"')
+    ? (unitMode === 'mm' ? S.length + ' mm' : S.length + '"')
     : '—';
 
   sv('sv-diam', diamStr, !S.diam);
@@ -297,9 +299,9 @@ function updateDrawing() {
 
   if (unitMode === 'mm') {
     labels.diam.textContent = S.diam ? S.diam + ' mm' : "DIAMETER";
-    labels.len.textContent  = S.length ? (parseFloat(S.length) * 25.4).toFixed(1) + ' mm' : "HEATED LENGTH";
-    labels.lead.textContent = S.stdlead ? (parseFloat(S.stdlead) * 25.4).toFixed(1) + ' mm' : "LEAD LENGTH";
-    labels.prot.textContent = S.protLen ? (parseFloat(S.protLen) * 25.4).toFixed(1) + ' mm' : "PROT. LENGTH";
+    labels.len.textContent  = S.length ? S.length + ' mm' : "HEATED LENGTH";
+    labels.lead.textContent = S.stdlead ? S.stdlead + ' mm' : "LEAD LENGTH";
+    labels.prot.textContent = S.protLen ? S.protLen + ' mm' : "PROT. LENGTH";
   } else {
     labels.diam.textContent = S.diam ? diamDisplay(S.diam) : "DIAMETER";
     labels.len.textContent  = S.length ? S.length + '"' : "HEATED LENGTH";
@@ -327,15 +329,15 @@ function updateDrawing() {
     specsList.innerHTML = `
       <div class="spec-line"><span class="sl-lbl">Wattage:</span> <span class="sl-val">${S.watt ? S.watt + 'W' : 'NA'}</span></div>
       <div class="spec-line"><span class="sl-lbl">Voltage:</span> <span class="sl-val">${S.volt ? S.volt + 'V' : 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">NPT Fitting / Flange:</span> <span class="sl-val">NA</span></div>
-      <div class="spec-line"><span class="sl-lbl">Process Fitting / Connection:</span> <span class="sl-val">NA</span></div>
+      <div class="spec-line"><span class="sl-lbl">NPT Fitting / Flange:</span> <span class="sl-val">${S.nptType !== 'na' ? S.nptType : 'NA'}</span></div>
+      <div class="spec-line"><span class="sl-lbl">Process Fitting / Connection:</span> <span class="sl-val">${S.processConn !== 'na' ? S.processConn : 'NA'}</span></div>
       <div class="spec-line"><span class="sl-lbl">Fitting Options:</span> <span class="sl-val">${FIT_LABELS[S.fit] || 'NA'}</span></div>
       <div class="spec-line"><span class="sl-lbl">Exit & Lead Protection:</span> <span class="sl-val">${EXIT_LABELS[S.exit] || 'None'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Lead Material:</span> <span class="sl-val">${LEAD_LABELS[S.lead] || 'NA'}</span></div>
-      <div class="spec-line"><span class="sl-lbl">Internal Thermocouple:</span> <span class="sl-val">None</span></div>
-      <div class="spec-line"><span class="sl-lbl">Ground Wire:</span> <span class="sl-val">NA</span></div>
-      <div class="spec-line"><span class="sl-lbl">Fiberglass Sleeving:</span> <span class="sl-val">NA</span></div>
-      <div class="spec-line"><span class="sl-lbl">End Seal / Potting:</span> <span class="sl-val">Cement Potting (Standard) – 1800°F 982°C</span></div>
+      <div class="spec-line"><span class="sl-lbl">Lead Material:</span> <span class="sl-val">${S.leadMat || 'NA'}</span></div>
+      <div class="spec-line"><span class="sl-lbl">Internal Thermocouple:</span> <span class="sl-val">${S.tcouple !== 'none' ? S.tcouple : 'None'}</span></div>
+      <div class="spec-line"><span class="sl-lbl">Ground Wire:</span> <span class="sl-val">${S.ground !== 'na' ? S.ground : 'NA'}</span></div>
+      <div class="spec-line"><span class="sl-lbl">Fiberglass Sleeving:</span> <span class="sl-val">${S.sleeving !== 'na' ? S.sleeving : 'NA'}</span></div>
+      <div class="spec-line"><span class="sl-lbl">End Seal / Potting:</span> <span class="sl-val">${S.seal === 'teflon' ? 'Teflon Seal - 300°F 149°C' : 'Cement Potting (Standard) – 1800°F 982°C'}</span></div>
     `;
   }
 }
@@ -394,7 +396,7 @@ function buildSpecText() {
     ? (unitMode === 'mm' ? S.diam + ' mm' : diamDisplay(S.diam))
     : 'Not set';
   const lenStr = S.length
-    ? (unitMode === 'mm' ? (parseFloat(S.length)*25.4).toFixed(1)+' mm' : S.length + '"')
+    ? (unitMode === 'mm' ? S.length + ' mm' : S.length + '"')
     : 'Not set';
   return [
     'CARTRIDGE HEATER — INTERNAL SPECIFICATION',
