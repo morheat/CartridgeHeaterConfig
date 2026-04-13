@@ -24,6 +24,10 @@
   <div class="drawing-panel">
     <div class="drawing-toolbar">
       <span>Technical Drawing</span>
+      <div class="drawing-toolbar-actions">
+        <button id="unitToggle" class="drawing-toolbar-btn" onclick="toggleUnits()">⇄ mm</button>
+        <button id="downloadPdfBtn" class="drawing-toolbar-btn" onclick="downloadDrawingPDF()">↓ Download PDF</button>
+      </div>
     </div>
       <div class="drawing-stage" id="drawingStage">
         <img id="heaterBaseImage" src="images/base-heater.png" class="heater-image" />
@@ -38,7 +42,7 @@
             </div>
           <div class="contact-col">
             MPI Morheat<br>
-            sales@mpimorheat.com<br>
+            <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7b081a171e083b160b12161409131e1a0f55181416">[email&#160;protected]</a><br>
             (800) 817-3486
           </div>
         </div>
@@ -58,13 +62,7 @@
             <div class="field">
               <div class="field-label">Outer Diameter</div>
               <div class="opts" id="diam-opts">
-                <div class="opt" data-group="diam" data-val="0.25" onclick="selectOpt(this)">1/4" <span class="sub">0.250"</span></div>
-                <div class="opt" data-group="diam" data-val="0.375" onclick="selectOpt(this)">3/8" <span class="sub">0.375"</span></div>
-                <div class="opt" data-group="diam" data-val="0.5" onclick="selectOpt(this)">1/2" <span class="sub">0.500"</span></div>
-                <div class="opt" data-group="diam" data-val="0.625" onclick="selectOpt(this)">5/8" <span class="sub">0.625"</span></div>
-                <div class="opt" data-group="diam" data-val="0.75" onclick="selectOpt(this)">3/4" <span class="sub">0.750"</span></div>
-                <div class="opt" data-group="diam" data-val="1.0" onclick="selectOpt(this)">1" <span class="sub">1.000"</span></div>
-              </div>
+                </div>
             </div>
             <div class="field">
               <div class="field-label">Heated Length</div>
@@ -94,10 +92,9 @@
         <div class="section-body">
           <div class="field">
             <div class="field-label">Voltage</div>
-            <div class="opts" id="volt-opts">
-              <div class="opt" data-group="volt" data-val="120" onclick="selectOpt(this)">120V</div>
-              <div class="opt" data-group="volt" data-val="240" onclick="selectOpt(this)">240V</div>
-              <div class="opt" data-group="volt" data-val="480" onclick="selectOpt(this)">480V</div>
+            <div class="num-wrap">
+              <input type="number" id="volt-in" min="1" max="1000" step="1" placeholder="e.g. 120" oninput="updateCalc()">
+              <span class="num-unit">volts</span>
             </div>
           </div>
           <div class="field">
@@ -300,12 +297,15 @@
         <div class="btn-wrap">
           <button class="btn btn-primary" onclick="copySpecToClipboard()">Copy Spec Sheet</button>
         </div>
+    
       </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

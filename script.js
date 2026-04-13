@@ -12,6 +12,94 @@ let S = {
   seal: 'cement'
 };
 
+let unitMode = 'in'; // 'in' or 'mm'
+
+const INCH_DIAMS = [
+  { frac: '1/8"', dec: '0.125' }, { frac: '1/4"', dec: '0.250' },
+  { frac: '5/16"', dec: '0.312' }, { frac: '3/8"', dec: '0.375' },
+  { frac: '1/2"', dec: '0.500' }, { frac: '17/32"', dec: '0.531' },
+  { frac: '5/8"', dec: '0.625' }, { frac: '11/16"', dec: '0.687' },
+  { frac: '3/4"', dec: '0.750' }, { frac: '7/8"', dec: '0.875' },
+  { frac: '1"', dec: '1.000' }
+];
+
+const MM_DIAMS = [6, 6.5, 8, 10, 12, 12.5, 13, 14, 15, 16, 17, 19, 20, 21, 25];
+
+function diamDisplay(val) {
+  if (!val) return '—';
+  if (unitMode === 'mm') return val + ' mm';
+  const found = INCH_DIAMS.find(d => d.dec === String(val));
+  return found ? found.frac : (val + '"');
+}
+
+function renderDiamOptions() {
+  const container = document.getElementById('diam-opts');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  if (unitMode === 'in') {
+    INCH_DIAMS.forEach(d => {
+      const opt = document.createElement('div');
+      opt.className = `opt ${S.diam === d.dec ? 'selected' : ''}`;
+      opt.dataset.group = 'diam';
+      opt.dataset.val = d.dec;
+      opt.innerHTML = `${d.frac} <span class="sub">${d.dec}"</span>`;
+      opt.onclick = function() { selectOpt(this); };
+      container.appendChild(opt);
+    });
+  } else {
+    MM_DIAMS.forEach(m => {
+      const valStr = String(m);
+      const opt = document.createElement('div');
+      opt.className = `opt ${S.diam === valStr ? 'selected' : ''}`;
+      opt.dataset.group = 'diam';
+      opt.dataset.val = valStr;
+      opt.innerHTML = `${valStr} <span class="sub">mm</span>`;
+      opt.onclick = function() { selectOpt(this); };
+      container.appendChild(opt);
+    });
+  }
+}
+
+function toggleUnits() {
+  const prevMode = unitMode;
+  unitMode = unitMode === 'in' ? 'mm' : 'in';
+
+  const btn = document.getElementById('unitToggle');
+  if (btn) btn.textContent = unitMode === 'in' ? '⇄ mm' : '⇄ inches';
+
+  // Convert the numeric input field values
+  const numFields = [
+    { id: 'length-in', key: 'length' },
+    { id: 'lead-in',   key: 'stdlead' },
+    { id: 'prot-in',   key: 'protLen' }
+  ];
+  numFields.forEach(({ id, key }) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const raw = parseFloat(S[key]);
+    if (!isNaN(raw) && raw > 0) {
+      el.value = unitMode === 'mm'
+        ? (raw * 25.4).toFixed(1)
+        : parseFloat((raw / 25.4).toFixed(4));
+    } else {
+      el.value = '';
+    }
+  });
+
+  // Update "inches" / "mm" unit labels next to inputs
+  document.querySelectorAll('.num-unit').forEach(el => {
+    if (el.textContent === 'inches' || el.textContent === 'mm') {
+      el.textContent = unitMode === 'in' ? 'inches' : 'mm';
+    }
+  });
+
+  S.diam = ''; // Clear selection on unit swap since catalogs differ
+  renderDiamOptions();
+  updateDrawing();
+  updateVis();
+}
+
 // --- NEW: Load saved state from LocalStorage so it survives browser refresh ---
 try {
   const savedState = localStorage.getItem('heaterDevState');
@@ -25,17 +113,9 @@ function saveState() {
 }
 
 function syncUIToState() {
-  const inputs = { 'length-in': 'length', 'lead-in': 'stdlead', 'prot-in': 'protLen', 'watt-in': 'watt' };
-  for (let [id, key] of Object.entries(inputs)) {
-    if (document.getElementById(id)) document.getElementById(id).value = S[key];
-  }
-
-  const selects = { 'npt-type': 'nptType', 'process-conn': 'processConn', 'tcouple-type': 'tcouple', 'tcouple-loc': 'tcoupleLoc', 'ground-wire': 'ground', 'fiberglass-sleeve': 'sleeving', 'end-seal': 'seal' };
-  for (let [id, key] of Object.entries(selects)) {
-    if (document.getElementById(id)) document.getElementById(id).value = S[key];
-  }
-
-  ['diam', 'volt', 'sheath', 'lead', 'exit', 'fit'].forEach(group => {
+const inputs = { 'length-in': 'length', 'lead-in': 'stdlead', 'prot-in': 'protLen', 'watt-in': 'watt', 'volt-in': 'volt' };
+  // ...
+  ['diam', 'sheath', 'lead', 'exit', 'fit'].forEach(group => { // removed 'volt' here
     document.querySelectorAll(`[data-group="${group}"]`).forEach(opt => {
       opt.classList.toggle('selected', opt.dataset.val === S[group]);
     });
@@ -132,10 +212,20 @@ function selectOpt(el) {
 }
 
 function updateCalc() {
-  if (document.getElementById("length-in")) S.length = document.getElementById("length-in").value;
-  if (document.getElementById("lead-in")) S.stdlead = document.getElementById("lead-in").value;
-  if (document.getElementById("prot-in")) S.protLen = document.getElementById("prot-in").value;
+  // Read numeric inputs — convert from mm to inches if in mm mode
+  const readLen = (id) => {
+    const el = document.getElementById(id);
+    if (!el || el.value === '') return '';
+    const raw = parseFloat(el.value);
+    if (isNaN(raw)) return '';
+    return unitMode === 'mm' ? raw / 25.4 : raw;
+  };
+
+  S.length  = readLen('length-in');
+  S.stdlead = readLen('lead-in');
+  S.protLen = readLen('prot-in');
   if (document.getElementById("watt-in")) S.watt = document.getElementById("watt-in").value;
+  if (document.getElementById("volt-in")) S.volt = document.getElementById("volt-in").value;
 
   const protGroup = document.getElementById("prot-len-group");
   const isProtected = S.exit.includes('braid') || S.exit.includes('armor');
@@ -172,8 +262,15 @@ function updateVis() {
   const lead = document.getElementById('h-lead');
   if (lead) lead.setAttribute('x', x0 + w);
 
-  sv('sv-diam', S.diam ? S.diam + '"' : '—', !S.diam);
-  sv('sv-len', S.length ? S.length + '"' : '—', !S.length);
+  const diamStr = S.diam
+    ? (unitMode === 'mm' ? S.diam + ' mm' : diamDisplay(S.diam))
+    : '—';
+  const lenStr = S.length
+    ? (unitMode === 'mm' ? (parseFloat(S.length)*25.4).toFixed(1)+' mm' : S.length + '"')
+    : '—';
+
+  sv('sv-diam', diamStr, !S.diam);
+  sv('sv-len',  lenStr,  !S.length);
   sv('sv-volt', S.volt ? S.volt + 'V' : '—', !S.volt);
   sv('sv-watt', S.watt ? S.watt + 'W' : '—', !S.watt);
   sv('sv-sheath', S.sheath ? SHEATH_LABELS[S.sheath] : '—', !S.sheath);
@@ -196,12 +293,23 @@ function updateDrawing() {
     prot: document.getElementById("dimProt")
   };
 
-  labels.diam.textContent = S.diam ? S.diam + '"' : "DIAMETER";
-  labels.len.textContent  = S.length ? S.length + '"' : "HEATED LENGTH";
-  labels.lead.textContent = S.stdlead ? S.stdlead + '"' : "LEAD LENGTH";
-  labels.prot.textContent = S.protLen ? S.protLen + '"' : "PROT. LENGTH";
-
   const isProtected = S.exit.includes('braid') || S.exit.includes('armor');
+
+  if (unitMode === 'mm') {
+    labels.diam.textContent = S.diam ? S.diam + ' mm' : "DIAMETER";
+    labels.len.textContent  = S.length ? (parseFloat(S.length) * 25.4).toFixed(1) + ' mm' : "HEATED LENGTH";
+    labels.lead.textContent = S.stdlead ? (parseFloat(S.stdlead) * 25.4).toFixed(1) + ' mm' : "LEAD LENGTH";
+    labels.prot.textContent = S.protLen ? (parseFloat(S.protLen) * 25.4).toFixed(1) + ' mm' : "PROT. LENGTH";
+  } else {
+    labels.diam.textContent = S.diam ? diamDisplay(S.diam) : "DIAMETER";
+    labels.len.textContent  = S.length ? S.length + '"' : "HEATED LENGTH";
+    labels.lead.textContent = S.stdlead ? S.stdlead + '"' : "LEAD LENGTH";
+    labels.prot.textContent = S.protLen ? S.protLen + '"' : "PROT. LENGTH";
+  }
+
+  labels.diam.style.display = "block";
+  labels.len.style.display  = "block";
+  labels.lead.style.display = "block";
   labels.prot.style.display = isProtected ? "block" : "none";
 
   Object.keys(labels).forEach(key => {
@@ -282,11 +390,17 @@ function makeLabelsDraggable() {
 // --------------------------------------------------------------------------------
 
 function buildSpecText() {
+  const diamStr = S.diam
+    ? (unitMode === 'mm' ? S.diam + ' mm' : diamDisplay(S.diam))
+    : 'Not set';
+  const lenStr = S.length
+    ? (unitMode === 'mm' ? (parseFloat(S.length)*25.4).toFixed(1)+' mm' : S.length + '"')
+    : 'Not set';
   return [
     'CARTRIDGE HEATER — INTERNAL SPECIFICATION',
     '==========================================',
-    `  Outer Diameter:  ${S.diam ? S.diam + '"' : 'Not set'}`,
-    `  Heated Length:   ${S.length ? S.length + '"' : 'Not set'}`,
+    `  Outer Diameter:  ${diamStr}`,
+    `  Heated Length:   ${lenStr}`,
     `  Voltage:         ${S.volt ? S.volt + 'V' : 'Not set'}`,
     `  Wattage:         ${S.watt ? S.watt + 'W' : 'Not set'}`,
     `  Sheath:          ${S.sheath ? SHEATH_LABELS[S.sheath] : 'Not set'}`,
@@ -301,11 +415,47 @@ function copySpecToClipboard() {
   navigator.clipboard.writeText(text).then(() => {
     const t = document.getElementById('toast');
     if (t) {
-      t.textContent = 'Copied to clipboard';
+      t.textContent = '✓ Spec copied to clipboard';
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3000);
     }
   });
+}
+
+async function downloadDrawingPDF() {
+  const btn = document.getElementById('downloadPdfBtn');
+  const original = btn ? btn.textContent : '';
+  if (btn) btn.textContent = 'Generating…';
+
+  try {
+    const stage = document.getElementById('drawingStage');
+    const canvas = await html2canvas(stage, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#f8fafc',
+      logging: false
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+
+    const stageW = canvas.width / 2;
+    const stageH = canvas.height / 2;
+
+    const pdf = new jsPDF({
+      orientation: stageW > stageH ? 'landscape' : 'portrait',
+      unit: 'pt',
+      format: [stageW, stageH]
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, 0, stageW, stageH);
+    pdf.save('cartridge-heater-drawing.pdf');
+  } catch(e) {
+    console.error('PDF error:', e);
+    alert('Could not generate PDF. Please try again.');
+  }
+
+  if (btn) btn.textContent = original;
 }
 
 const themeToggle = document.getElementById("themeToggle");
@@ -316,6 +466,7 @@ themeToggle?.addEventListener("click", () => {
 });
 
 // Run Init Actions
+renderDiamOptions();
 syncUIToState();
 updateCalc();
 makeLabelsDraggable();
