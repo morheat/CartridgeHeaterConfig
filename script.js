@@ -232,39 +232,39 @@ const IMAGE_MAP = {
   "none_90_none": { file: "lead-90deg.png", coords: { diam: { top: '28%', left: '36%' }, len: { bottom: '50%', left: '45%' }, lead: { top: '61%', right: '39%' } } },
   "none_straight_braid": { file: "Lead-Straight_SSBraid.png", coords: { diam: { top: '32%', left: '19%' }, len: { bottom: '38%', left: '31%' }, lead: { top: '54%', right: '23%' }, prot: { top: '42%', right: '35%' } } },
   "none_90_braid": { file: "Lead-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '51%', left: '43%' }, lead: { top: '71%', right: '45.5%' }, prot: { top: '55%', right: '39%' } } },
-  "none_straight_armor": { file: "lead-Straight-SSArmor.png", coords: { diam: { top: '34%', left: '17%' }, len: { bottom: '35%', left: '29%' }, lead: { top: '55%', right: '25%' }, prot: { top: '43%', right: '39%' } } },
+  "none_straight_armor": { file: "lead-Straight-SSArmor.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '35%', left: '25%' }, lead: { top: '55%', right: '25%' }, prot: { top: '43%', right: '39%' } } },
   "none_90_armor": { file: "lead-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '51%', left: '43%' }, lead: { top: '71%', right: '45.5%' }, prot: { top: '55%', right: '39%' } }  },
-  "none_post": { file: "lead-PostTerminal.png", coords: { diam: { top: '36%', left: '27%' }, len: { bottom: '33%', left: '40%' }, lead: { top: '50%', right: '100%' } } },
+  "none_post": { file: "lead-PostTerminal.png", coords: { diam: { top: '32%', left: '22%' }, len: { bottom: '31%', left: '35%' }, lead: { top: '50%', right: '100%' } } },
   "none_box": { file: "lead-TerminalBox.png", coords: { diam: { top: '30%', left: '26%' }, len: { bottom: '37%', left: '39%' }, lead: { top: '50%', right: '100%' }} },
 
 
-  "brass_straight_none": { file: "Brass-Straight-noProtection.png", coords: { diam: { top: '32%', left: '15%' }, len: { bottom: '39%', left: '23%' }, lead: { top: '48%', right: '35%' } } },
+  "brass_straight_none": { file: "Brass-Straight-noProtection.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '39%', left: '23%' }, lead: { top: '48%', right: '35%' } } },
   "brass_90_none": { file: "Brass-90deg-noProtection.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '61%', right: '41%' } } },
-  "brass_straight_braid": { file: "Brass-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '16%' }, len: { bottom: '40%', left: '23%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "brass_straight_braid": { file: "Brass-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '40%', left: '21%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "brass_90_braid": { file: "Brass-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "brass_straight_armor": { file: "Brass-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '17%' }, len: { bottom: '40%', left: '23%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "brass_straight_armor": { file: "Brass-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '13%' }, len: { bottom: '38%', left: '21%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "brass_90_armor": { file: "Brass-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "brass_post": { file: "Brass-PostTerminal.png", coords: { diam: { top: '36%', left: '27%' }, len: { bottom: '33%', left: '34%' }, lead: { top: '50%', right: '100%' } } },
+  "brass_post": { file: "Brass-PostTerminal.png", coords: { diam: { top: '36%', left: '22%' }, len: { bottom: '33%', left: '29%' }, lead: { top: '50%', right: '100%' } } },
   "brass_box": { file: "Brass-TerminalBox.png", coords: { diam: { top: '30%', left: '26%' }, len: { bottom: '40%', left: '32%' }, lead: { top: '50%', right: '100%' }} },
 
 
-  "stainless_straight_none": { file: "Stainless-Straight-noProtection.png", coords: { diam: { top: '33%', left: '16%' }, len: { bottom: '39%', left: '23%' }, lead: { top: '48%', right: '35%' } } },
+  "stainless_straight_none": { file: "Stainless-Straight-noProtection.png", coords: { diam: { top: '32%', left: '13.5%' }, len: { bottom: '39%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
   "stainless_90_none": { file: "Stainless-90deg-noProtection.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '61%', right: '41%' } } },
-  "stainless_straight_braid": { file: "Stainless-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '16%' }, len: { bottom: '40%', left: '23%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "stainless_straight_braid": { file: "Stainless-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "stainless_90_braid": { file: "Stainless-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "stainless_straight_armor": { file: "stainless-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '17%' }, len: { bottom: '40%', left: '23%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "stainless_straight_armor": { file: "stainless-Straight-SSArmor.png", coords: { diam: { top: '31%', left: '13.5%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "stainless_90_armor": { file: "Stainless-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "stainless_post": { file: "stainless-PostTerminal.png", coords: { diam: { top: '36%', left: '27%' }, len: { bottom: '33%', left: '34%' }, lead: { top: '50%', right: '100%' } } },
+  "stainless_post": { file: "stainless-PostTerminal.png", coords: { diam: { top: '36%', left: '21.5%' }, len: { bottom: '31%', left: '30%' }, lead: { top: '50%', right: '100%' } } },
   "stainless_box": { file: "stainless-TerminalBox.png", coords: { diam: { top: '32%', left: '25%' }, len: { bottom: '40%', left: '32%' }, lead: { top: '50%', right: '100%' }} },
 
 
-  "double_straight_none": { file: "Double-Straight-NoProtection.png", coords: { diam: { top: '33%', left: '16%' }, len: { bottom: '40%', left: '22%' }, lead: { top: '48%', right: '35%' } } },
+  "double_straight_none": { file: "Double-Straight-NoProtection.png", coords: { diam: { top: '33%', left: '16%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
   "double_90_none": { file: "Double-90deg-noProtection.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '52%', left: '39%' }, lead: { top: '61%', right: '41%' } } },
-  "double_straight_braid": { file: "double-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '16%' }, len: { bottom: '40%', left: '23%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "double_straight_braid": { file: "double-Straight-SSBraid.png", coords: { diam: { top: '31%', left: '14.5%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '58%', right: '20%' }, prot: { top: '42%', right: '38%' } } },
   "double_90_braid": { file: "Double-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '51%', left: '39%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "double_straight_armor": { file: "Double-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '17%' }, len: { bottom: '40%', left: '23%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "double_straight_armor": { file: "Double-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '14%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "double_90_armor": { file: "Double-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '36%', left: '27%' }, len: { bottom: '37%', left: '32%' }, lead: { top: '50%', right: '100%' } } },
+  "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '34%', left: '22%' }, len: { bottom: '34%', left: '28%' }, lead: { top: '50%', right: '100%' } } },
   "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '32%', left: '25%' }, len: { bottom: '42%', left: '31%' }, lead: { top: '50%', right: '100%' }} }
 };
 
