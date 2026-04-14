@@ -71,7 +71,6 @@ function renderDiamOptions() {
     });
   }
 }
-
 function handleTCoupleChange() {
   const type = document.getElementById('tcouple-type').value;
   S.tcouple = type;
@@ -83,6 +82,9 @@ function handleTCoupleChange() {
     S.tcoupleLoc = 'na';
   } else {
     locGroup.style.display = 'block';
+    // Grab the current visible value of the location dropdown (e.g., 'disk') 
+    // and immediately save it to the state so the image triggers.
+    S.tcoupleLoc = document.getElementById('tcouple-loc').value;
   }
 
   updateCalc();
@@ -120,22 +122,26 @@ function toggleUnits() {
   updateVis();
 }
 
-// --- NEW: Load saved state from LocalStorage so it survives browser refresh ---
-try {
-  const savedState = localStorage.getItem('heaterDevState');
-  if (savedState) {
-    S = { ...S, ...JSON.parse(savedState) };
-  }
-} catch(e) { console.error("Could not load state"); }
+// --- Removed LocalStorage loading so it resets to default on reload ---
 
 function saveState() {
-  localStorage.setItem('heaterDevState', JSON.stringify(S));
+  // Keeping this function empty so we don't break other parts of the script
+  // localStorage.setItem('heaterDevState', JSON.stringify(S));
 }
 
 function syncUIToState() {
-const inputs = { 'length-in': 'length', 'lead-in': 'stdlead', 'prot-in': 'protLen', 'watt-in': 'watt', 'volt-in': 'volt' };
-  // ...
-  ['diam', 'sheath', 'leadMat', 'lead', 'exit', 'fit'].forEach(group => { // removed 'volt' here
+  const inputs = { 'length-in': 'length', 'lead-in': 'stdlead', 'prot-in': 'protLen', 'watt-in': 'watt', 'volt-in': 'volt' };
+  
+  // NEW: Fill the HTML input boxes with your saved state on load
+  Object.keys(inputs).forEach(id => {
+    const el = document.getElementById(id);
+    if (el && S[inputs[id]] !== undefined) {
+      el.value = S[inputs[id]];
+    }
+  });
+
+  // Keep your existing selection logic
+  ['diam', 'sheath', 'leadMat', 'lead', 'exit', 'fit'].forEach(group => { 
     document.querySelectorAll(`[data-group="${group}"]`).forEach(opt => {
       opt.classList.toggle('selected', opt.dataset.val === S[group]);
     });
@@ -229,43 +235,43 @@ const SEAL_LABELS = {
 
 const IMAGE_MAP = {
   "none_straight_none": { file: "base-heater.png", coords: { diam: { top: '34%', left: '19%' }, len: { bottom: '35%', left: '31%' }, lead: { top: '50%', right: '30%' } } },
-  "none_90_none": { file: "lead-90deg.png", coords: { diam: { top: '28%', left: '36%' }, len: { bottom: '50%', left: '45%' }, lead: { top: '61%', right: '39%' } } },
+  "none_90_none": { file: "lead-90deg.png", coords: { diam: { top: '13%', left: '30%' }, len: { bottom: '52%', left: '42%' }, lead: { top: '70%', right: '34%' } } },
   "none_straight_braid": { file: "Lead-Straight_SSBraid.png", coords: { diam: { top: '32%', left: '19%' }, len: { bottom: '38%', left: '31%' }, lead: { top: '54%', right: '23%' }, prot: { top: '42%', right: '35%' } } },
-  "none_90_braid": { file: "Lead-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '51%', left: '43%' }, lead: { top: '71%', right: '45.5%' }, prot: { top: '55%', right: '39%' } } },
+  "none_90_braid": { file: "Lead-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '27%' }, len: { bottom: '56%', left: '38%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "none_straight_armor": { file: "lead-Straight-SSArmor.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '35%', left: '25%' }, lead: { top: '55%', right: '25%' }, prot: { top: '43%', right: '39%' } } },
-  "none_90_armor": { file: "lead-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '51%', left: '43%' }, lead: { top: '71%', right: '45.5%' }, prot: { top: '55%', right: '39%' } }  },
-  "none_post": { file: "lead-PostTerminal.png", coords: { diam: { top: '32%', left: '22%' }, len: { bottom: '31%', left: '35%' }, lead: { top: '50%', right: '100%' } } },
-  "none_box": { file: "lead-TerminalBox.png", coords: { diam: { top: '30%', left: '26%' }, len: { bottom: '37%', left: '39%' }, lead: { top: '50%', right: '100%' }} },
+  "none_90_armor": { file: "lead-90deg-SSArmor.png", coords: { diam: { top: '13%', left: '27%' }, len: { bottom: '56%', left: '38%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } }  },
+  "none_post": { file: "lead-PostTerminal.png", coords: { diam: { top: '28%', left: '17%' }, len: { bottom: '25%', left: '35%' }, lead: { top: '50%', right: '100%' } } },
+  "none_box": { file: "lead-TerminalBox.png", coords: { diam: { top: '24%', left: '16%' }, len: { bottom: '35%', left: '30%' }, lead: { top: '50%', right: '100%' } } },
 
 
   "brass_straight_none": { file: "Brass-Straight-noProtection.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '39%', left: '23%' }, lead: { top: '48%', right: '35%' } } },
-  "brass_90_none": { file: "Brass-90deg-noProtection.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '61%', right: '41%' } } },
+  "brass_90_none": { file: "Brass-90deg-noProtection.png", coords: { diam: { top: '14%', left: '27%' }, len: { bottom: '57%', left: '33%' }, lead: { top: '70%', right: '37%' } } },
   "brass_straight_braid": { file: "Brass-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '40%', left: '21%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
-  "brass_90_braid": { file: "Brass-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
+  "brass_90_braid": { file: "Brass-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "brass_straight_armor": { file: "Brass-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '13%' }, len: { bottom: '38%', left: '21%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
-  "brass_90_armor": { file: "Brass-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "brass_post": { file: "Brass-PostTerminal.png", coords: { diam: { top: '36%', left: '22%' }, len: { bottom: '33%', left: '29%' }, lead: { top: '50%', right: '100%' } } },
-  "brass_box": { file: "Brass-TerminalBox.png", coords: { diam: { top: '30%', left: '26%' }, len: { bottom: '40%', left: '32%' }, lead: { top: '50%', right: '100%' }} },
+  "brass_90_armor": { file: "Brass-90deg-SSArmor.png", coords: { diam: { top: '12%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
+  "brass_post": { file: "Brass-PostTerminal.png", coords: { diam: { top: '32%', left: '17%' }, len: { bottom: '29%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
+  "brass_box": { file: "Brass-TerminalBox.png", coords: { diam: { top: '24%', left: '16%' }, len: { bottom: '38%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
 
 
   "stainless_straight_none": { file: "Stainless-Straight-noProtection.png", coords: { diam: { top: '32%', left: '13.5%' }, len: { bottom: '39%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
-  "stainless_90_none": { file: "Stainless-90deg-noProtection.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '61%', right: '41%' } } },
+  "stainless_90_none": { file: "Stainless-90deg-noProtection.png", coords: { diam: { top: '14%', left: '27%' }, len: { bottom: '57%', left: '33%' }, lead: { top: '70%', right: '37%' } } },
   "stainless_straight_braid": { file: "Stainless-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '57%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
-  "stainless_90_braid": { file: "Stainless-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
+  "stainless_90_braid": { file: "Stainless-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "stainless_straight_armor": { file: "stainless-Straight-SSArmor.png", coords: { diam: { top: '31%', left: '13.5%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
-  "stainless_90_armor": { file: "Stainless-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "stainless_post": { file: "stainless-PostTerminal.png", coords: { diam: { top: '36%', left: '21.5%' }, len: { bottom: '31%', left: '30%' }, lead: { top: '50%', right: '100%' } } },
-  "stainless_box": { file: "stainless-TerminalBox.png", coords: { diam: { top: '32%', left: '25%' }, len: { bottom: '40%', left: '32%' }, lead: { top: '50%', right: '100%' }} },
+  "stainless_90_armor": { file: "Stainless-90deg-SSArmor.png", coords: { diam: { top: '12%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
+  "stainless_post": { file: "stainless-PostTerminal.png", coords: { diam: { top: '32%', left: '16%' }, len: { bottom: '29%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
+  "stainless_box": { file: "stainless-TerminalBox.png", coords: { diam: { top: '24%', left: '15%' }, len: { bottom: '38%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
 
 
-  "double_straight_none": { file: "Double-Straight-NoProtection.png", coords: { diam: { top: '33%', left: '16%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
-  "double_90_none": { file: "Double-90deg-noProtection.png", coords: { diam: { top: '28%', left: '35%' }, len: { bottom: '52%', left: '39%' }, lead: { top: '61%', right: '41%' } } },
-  "double_straight_braid": { file: "double-Straight-SSBraid.png", coords: { diam: { top: '31%', left: '14.5%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '58%', right: '20%' }, prot: { top: '42%', right: '38%' } } },
-  "double_90_braid": { file: "Double-90deg-SSBraid.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '51%', left: '39%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "double_straight_armor": { file: "Double-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '14%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
-  "double_90_armor": { file: "Double-90deg-SSArmor.png", coords: { diam: { top: '28%', left: '34%' }, len: { bottom: '52%', left: '40%' }, lead: { top: '72%', right: '46%' }, prot: { top: '55%', right: '39%' } } },
-  "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '34%', left: '22%' }, len: { bottom: '34%', left: '28%' }, lead: { top: '50%', right: '100%' } } },
-  "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '32%', left: '25%' }, len: { bottom: '42%', left: '31%' }, lead: { top: '50%', right: '100%' }} }
+  "double_straight_none": { file: "Double-Straight-NoProtection.png", coords: { diam: { top: '33%', left: '14%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
+  "double_90_none": { file: "Double-90deg-noProtection.png", coords: { diam: { top: '14%', left: '27%' }, len: { bottom: '57%', left: '33%' }, lead: { top: '70%', right: '37%' } } },
+  "double_straight_braid": { file: "double-Straight-SSBraid.png", coords: { diam: { top: '32%', left: '16%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '58%', right: '20%' }, prot: { top: '42%', right: '38%' } } },
+  "double_90_braid": { file: "Double-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '25%' }, len: { bottom: '56%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
+  "double_straight_armor": { file: "Double-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '15%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
+  "double_90_armor": { file: "Double-90deg-SSArmor.png", coords: { diam: { top: '15%', left: '26%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '45.5%' }, prot: { top: '59%', right: '35%' } } },
+  "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '30%', left: '16%' }, len: { bottom: '32%', left: '22%' }, lead: { top: '50%', right: '100%' } } },
+  "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '24%', left: '15%' }, len: { bottom: '40%', left: '21%' }, lead: { top: '50%', right: '100%' } } }
 };
 
 const TCOUPLE_IMAGE_MAP = {
@@ -588,7 +594,7 @@ async function downloadDrawingPDF() {
   try {
     const stage = document.getElementById('drawingStage');
     const canvas = await html2canvas(stage, {
-      scale: 2,
+      scale: 2, // Keeps the resolution high
       useCORS: true,
       backgroundColor: '#f8fafc',
       logging: false
@@ -597,16 +603,18 @@ async function downloadDrawingPDF() {
     const imgData = canvas.toDataURL('image/png');
     const { jsPDF } = window.jspdf;
 
-    const stageW = canvas.width / 2;
-    const stageH = canvas.height / 2;
+    // Grab the actual CSS pixel dimensions of the container
+    const pdfWidth = stage.offsetWidth;
+    const pdfHeight = stage.offsetHeight;
 
     const pdf = new jsPDF({
-      orientation: stageW > stageH ? 'landscape' : 'portrait',
-      unit: 'pt',
-      format: [stageW, stageH]
+      orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
+      unit: 'px', // Force jsPDF to use pixels instead of points
+      format: [pdfWidth, pdfHeight]
     });
 
-    pdf.addImage(imgData, 'PNG', 0, 0, stageW, stageH);
+    // Draw the image using the exact container dimensions
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     pdf.save('cartridge-heater-drawing.pdf');
   } catch(e) {
     console.error('PDF error:', e);

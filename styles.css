@@ -132,9 +132,9 @@ header {
 }
 
 .heater-image {
-  max-width: 90%;
-  max-height: 280px;
-  object-fit: contain; /* Normalizes the 90deg drawing size */
+  max-width: 70%;
+  max-height: 500px; /* Increased from 280px to give 90-deg heaters more vertical room */
+  object-fit: contain; 
   transition: opacity 0.2s;
 }
 .hidden { display: none; }
