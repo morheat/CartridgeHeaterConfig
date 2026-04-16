@@ -121,7 +121,7 @@ header {
   position: relative;
   width: 100%;
   min-height: 480px; /* Increased height to make room for text overlay */
-  background: #f8fafc;
+  background: #ffffff;
   border: 1px solid #dbe3ee;
   border-radius: 8px;
   display: flex;
