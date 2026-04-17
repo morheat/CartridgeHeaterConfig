@@ -8,12 +8,13 @@ let S = {
   processConn: 'na',
   tcouple: 'none', 
   tcoupleLoc: 'na',
-  ground: 'na', 
   sleeving: 'na', 
   seal: 'cement',
   ground: 'no',
   sleeving: 'none'
 };
+
+let LOCK_CONFIG = true; // <-- turn ON for dev, OFF later
 
 let unitMode = 'in'; // 'in' or 'mm'
 
@@ -240,8 +241,8 @@ const IMAGE_MAP = {
   "none_90_braid": { file: "Lead-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '27%' }, len: { bottom: '56%', left: '38%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "none_straight_armor": { file: "lead-Straight-SSArmor.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '35%', left: '25%' }, lead: { top: '55%', right: '25%' }, prot: { top: '43%', right: '39%' } } },
   "none_90_armor": { file: "lead-90deg-SSArmor.png", coords: { diam: { top: '13%', left: '27%' }, len: { bottom: '56%', left: '38%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } }  },
-  "none_post": { file: "lead-PostTerminal.png", coords: { diam: { top: '28%', left: '17%' }, len: { bottom: '25%', left: '35%' }, lead: { top: '50%', right: '100%' } } },
-  "none_box": { file: "lead-TerminalBox.png", coords: { diam: { top: '24%', left: '16%' }, len: { bottom: '35%', left: '30%' }, lead: { top: '50%', right: '100%' } } },
+  "none_post": { file: "lead-PostTerminal.png", coords: { diam: { top: '32%', left: '24%' }, len: { bottom: '31%', left: '38%' }, lead: { top: '50%', right: '100%' } } },
+  "none_box": { file: "lead-TerminalBox.png", coords: { diam: { top: '28%', left: '23%' }, len: { bottom: '37%', left: '36%' }, lead: { top: '50%', right: '100%' } } },
 
 
   "brass_straight_none": { file: "Brass-Straight-noProtection.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '39%', left: '23%' }, lead: { top: '48%', right: '35%' } } },
@@ -250,8 +251,8 @@ const IMAGE_MAP = {
   "brass_90_braid": { file: "Brass-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "brass_straight_armor": { file: "Brass-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '13%' }, len: { bottom: '38%', left: '21%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "brass_90_armor": { file: "Brass-90deg-SSArmor.png", coords: { diam: { top: '12%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
-  "brass_post": { file: "Brass-PostTerminal.png", coords: { diam: { top: '32%', left: '17%' }, len: { bottom: '29%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
-  "brass_box": { file: "Brass-TerminalBox.png", coords: { diam: { top: '24%', left: '16%' }, len: { bottom: '38%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
+  "brass_post": { file: "Brass-PostTerminal.png", coords: { diam: { top: '36%', left: '24%' }, len: { bottom: '32%', left: '31%' }, lead: { top: '50%', right: '100%' } } },
+  "brass_box": { file: "Brass-TerminalBox.png", coords: { diam: { top: '30%', left: '24%' }, len: { bottom: '41%', left: '31%' }, lead: { top: '50%', right: '100%' } } },
 
 
   "stainless_straight_none": { file: "Stainless-Straight-noProtection.png", coords: { diam: { top: '32%', left: '13.5%' }, len: { bottom: '39%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
@@ -260,8 +261,8 @@ const IMAGE_MAP = {
   "stainless_90_braid": { file: "Stainless-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "stainless_straight_armor": { file: "stainless-Straight-SSArmor.png", coords: { diam: { top: '31%', left: '13.5%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "stainless_90_armor": { file: "Stainless-90deg-SSArmor.png", coords: { diam: { top: '12%', left: '25%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
-  "stainless_post": { file: "stainless-PostTerminal.png", coords: { diam: { top: '32%', left: '16%' }, len: { bottom: '29%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
-  "stainless_box": { file: "stainless-TerminalBox.png", coords: { diam: { top: '24%', left: '15%' }, len: { bottom: '38%', left: '25%' }, lead: { top: '50%', right: '100%' } } },
+  "stainless_post": { file: "stainless-PostTerminal.png", coords: { diam: { top: '36%', left: '24%' }, len: { bottom: '32%', left: '31%' }, lead: { top: '50%', right: '100%' } } },
+  "stainless_box": { file: "stainless-TerminalBox.png", coords: { diam: { top: '30%', left: '23%' }, len: { bottom: '41%', left: '31%' }, lead: { top: '50%', right: '100%' } } },
 
 
   "double_straight_none": { file: "Double-Straight-NoProtection.png", coords: { diam: { top: '33%', left: '14%' }, len: { bottom: '40%', left: '20%' }, lead: { top: '48%', right: '35%' } } },
@@ -270,8 +271,8 @@ const IMAGE_MAP = {
   "double_90_braid": { file: "Double-90deg-SSBraid.png", coords: { diam: { top: '13%', left: '25%' }, len: { bottom: '56%', left: '32%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
   "double_straight_armor": { file: "Double-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '15%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "double_90_armor": { file: "Double-90deg-SSArmor.png", coords: { diam: { top: '15%', left: '26%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '45.5%' }, prot: { top: '59%', right: '35%' } } },
-  "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '30%', left: '16%' }, len: { bottom: '32%', left: '22%' }, lead: { top: '50%', right: '100%' } } },
-  "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '24%', left: '15%' }, len: { bottom: '40%', left: '21%' }, lead: { top: '50%', right: '100%' } } }
+  "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '36%', left: '24%' }, len: { bottom: '36%', left: '28%' }, lead: { top: '50%', right: '100%' } } },
+  "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '30%', left: '23%' }, len: { bottom: '42%', left: '28%' }, lead: { top: '50%', right: '100%' } } }
 };
 
 const TCOUPLE_IMAGE_MAP = {
@@ -292,17 +293,40 @@ function selectOpt(el) {
 }
 
 function updateCalc() {
-  const readLen = (id) => {
-    const el = document.getElementById(id);
-    if (!el || el.value === '') return '';
-    const raw = parseFloat(el.value);
-    if (isNaN(raw)) return '';
-    return raw; // Just return the exact number they typedext
-  };
+  if (LOCK_CONFIG) {
+    // Only update numeric values, do NOT touch config-related state
+    const readLen = (id) => {
+      const el = document.getElementById(id);
+      if (!el || el.value === '') return '';
+      const raw = parseFloat(el.value);
+      return isNaN(raw) ? '' : raw;
+    };
+
+    S.length  = readLen('length-in');
+    S.stdlead = readLen('lead-in');
+    S.protLen = readLen('prot-in');
+
+    if (document.getElementById("watt-in")) S.watt = document.getElementById("watt-in").value;
+    if (document.getElementById("volt-in")) S.volt = document.getElementById("volt-in").value;
+
+    updateVis();
+    updateDrawing();
+    return; // 🚨 stop here so nothing else messes with config
+  }
 
   S.length  = readLen('length-in');
   S.stdlead = readLen('lead-in');
   S.protLen = readLen('prot-in');
+
+  if (!EXIT_LABELS[S.exit]) {
+    console.warn("Invalid exit detected:", S.exit);
+    S.exit = 'straight_none';
+  }
+
+  if (!FIT_LABELS[S.fit]) {
+    console.warn("Invalid fit detected:", S.fit);
+    S.fit = 'none';
+  }
   if (document.getElementById("watt-in")) S.watt = document.getElementById("watt-in").value;
   if (document.getElementById("volt-in")) S.volt = document.getElementById("volt-in").value;
 
@@ -316,6 +340,9 @@ function updateCalc() {
   saveState(); // Saves to localStorage instantly
   updateVis();
   updateDrawing();
+  if (!LOCK_CONFIG) {
+    syncUIToState();
+  }
 }
 
 function sv(id, val, isEmpty) {
@@ -374,8 +401,20 @@ function updateDrawing() {
   
   baseImg.src = `images/${config.file}`;
 
+  // --- ADD THIS LOGIC BLOCK ---
+  // Shrink the image specifically for post terminal and terminal box
+  if (S.exit === 'post' || S.exit === 'box') {
+      baseImg.classList.add('small-exit');
+    } else {
+      baseImg.classList.remove('small-exit');
+    }
+  // ----------------------------
+
   // --- Thermocouple overlay (SAFE) ---
   const tcImg = document.getElementById('tcOverlay');
+
+  // --- Thermocouple overlay (SAFE) ---
+ // const tcImg = document.getElementById('tcOverlay');
 
   if (tcImg) {
     if (S.tcouple !== 'none' && S.tcoupleLoc !== 'na') {

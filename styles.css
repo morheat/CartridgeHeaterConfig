@@ -137,6 +137,10 @@ header {
   object-fit: contain; 
   transition: opacity 0.2s;
 }
+.heater-image.small-exit {
+  transform: scale(0.75); /* Visually shrinks the image by 30% */
+}
+
 .hidden { display: none; }
 
 /* styles.css */
