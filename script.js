@@ -272,7 +272,16 @@ const IMAGE_MAP = {
   "double_straight_armor": { file: "Double-Straight-SSArmor.png", coords: { diam: { top: '33%', left: '15%' }, len: { bottom: '38%', left: '20%' }, lead: { top: '56%', right: '24%' }, prot: { top: '43%', right: '39%' } } },
   "double_90_armor": { file: "Double-90deg-SSArmor.png", coords: { diam: { top: '15%', left: '26%' }, len: { bottom: '58%', left: '32%' }, lead: { top: '85%', right: '45.5%' }, prot: { top: '59%', right: '35%' } } },
   "double_post": { file: "Double-PostTerminal.png", coords: { diam: { top: '36%', left: '24%' }, len: { bottom: '36%', left: '28%' }, lead: { top: '50%', right: '100%' } } },
-  "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '30%', left: '23%' }, len: { bottom: '42%', left: '28%' }, lead: { top: '50%', right: '100%' } } }
+  "double_box": { file: "Double-TerminalBox.png", coords: { diam: { top: '30%', left: '23%' }, len: { bottom: '42%', left: '28%' }, lead: { top: '50%', right: '100%' } } },
+
+  "flange_straight_none": { file: "Flange-Straight-none.png", coords: { diam: { top: '34%', left: '15%' }, len: { bottom: '36%', left: '25%' }, lead: { top: '51%', right: '32%' } } },
+  "flange_90_none": { file: "Flange-90-none.png", coords: { diam: { top: '14%', left: '26%' }, len: { bottom: '55%', left: '38%' }, lead: { top: '70%', right: '38%' } } },
+  "flange_straight_braid": { file: "Flange-Straight-SSBraid.png", coords: { diam: { top: '35%', left: '14%' }, len: { bottom: '34%', left: '25%' }, lead: { top: '62%', right: '21%' }, prot: { top: '47%', right: '37%' } } },
+  "flange_90_braid": { file: "Flange-90-SSBraid.png", coords: { diam: { top: '13%', left: '27%' }, len: { bottom: '56%', left: '38%' }, lead: { top: '85%', right: '44%' }, prot: { top: '59%', right: '32.5%' } } },
+  "flange_straight_armor": { file: "Flange-Straight-SSArmor.png", coords: { diam: { top: '32%', left: '14%' }, len: { bottom: '35%', left: '25%' }, lead: { top: '55%', right: '25%' }, prot: { top: '43%', right: '39%' } } },
+  "flange_90_armor": { file: "Flange-90-SSArmor.png", coords: { diam: { top: '12%', left: '26%' }, len: { bottom: '56%', left: '38%' }, lead: { top: '87%', right: '46%' }, prot: { top: '59%', right: '34.5%' } }  },
+  "flange_post": { file: "Flange-PostTerminal.png", coords: { diam: { top: '32%', left: '24%' }, len: { bottom: '31%', left: '38%' }, lead: { top: '50%', right: '100%' } } },
+  "flange_box": { file: "Flange-TerminalBox.png", coords: { diam: { top: '28%', left: '23%' }, len: { bottom: '37%', left: '36%' }, lead: { top: '50%', right: '100%' } } },
 };
 
 const TCOUPLE_IMAGE_MAP = {
@@ -395,8 +404,16 @@ function updateVis() {
 }
 
 function updateDrawing() {
-  const baseImg = document.getElementById('heaterBaseImage');
-  const key = `${S.fit}_${S.exit}`;
+const baseImg = document.getElementById('heaterBaseImage');
+  
+  // If Flange is selected in the Process Fitting dropdown, override the image prefix.
+  // Otherwise, use the standard fitting (none, brass, stainless, double).
+  let prefix = S.fit;
+  if (S.nptType === 'flange') {
+    prefix = 'flange';
+  }
+  
+  const key = `${prefix}_${S.exit}`;
   const config = IMAGE_MAP[key] || IMAGE_MAP["none_straight_none"];
   
   baseImg.src = `images/${config.file}`;
